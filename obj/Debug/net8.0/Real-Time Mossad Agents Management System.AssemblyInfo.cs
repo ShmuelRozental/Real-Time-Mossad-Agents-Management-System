@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Real-Time Mossad Agents Management System")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+07269d899c115d288ca99a4826e8e8c0b57d8525")]
 [assembly: System.Reflection.AssemblyProductAttribute("Real-Time Mossad Agents Management System")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Real-Time Mossad Agents Management System")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

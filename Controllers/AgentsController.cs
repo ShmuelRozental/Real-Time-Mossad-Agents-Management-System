@@ -74,12 +74,12 @@ namespace Real_Time_Mossad_Agents_Management_System.Controllers
 
         // POST: api/Agents
         [HttpPost]
-        public async Task<ActionResult<Agent>> PostAgent(Agent agent)
+        public async Task<ActionResult<int>> PostAgent(Agent agent)
         {
             _context.Agents.Add(agent);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetAgent", new { id = agent.Id }, agent);
+            return CreatedAtAction("GetAgent", new { id = agent.Id }, agent.Id);
         }
 
         // DELETE: api/Agents/5

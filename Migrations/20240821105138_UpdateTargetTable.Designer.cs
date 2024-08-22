@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Real_Time_Mossad_Agents_Management_System.Data;
 
@@ -11,9 +12,11 @@ using Real_Time_Mossad_Agents_Management_System.Data;
 namespace Real_Time_Mossad_Agents_Management_System.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240821105138_UpdateTargetTable")]
+    partial class UpdateTargetTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -100,30 +103,6 @@ namespace Real_Time_Mossad_Agents_Management_System.Migrations
                         .IsRequired();
 
                     b.Navigation("Agent");
-                });
-
-            modelBuilder.Entity("Real_Time_Mossad_Agents_Management_System.Models.Target", b =>
-                {
-                    b.OwnsOne("Real_Time_Mossad_Agents_Management_System.Models.PinLocation", "Location", b1 =>
-                        {
-                            b1.Property<int>("TargetId")
-                                .HasColumnType("int");
-
-                            b1.Property<int>("X")
-                                .HasColumnType("int");
-
-                            b1.Property<int>("Y")
-                                .HasColumnType("int");
-
-                            b1.HasKey("TargetId");
-
-                            b1.ToTable("Targets");
-
-                            b1.WithOwner()
-                                .HasForeignKey("TargetId");
-                        });
-
-                    b.Navigation("Location");
                 });
 #pragma warning restore 612, 618
         }

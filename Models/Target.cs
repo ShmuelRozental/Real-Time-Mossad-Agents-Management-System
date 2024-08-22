@@ -6,10 +6,12 @@ namespace Real_Time_Mossad_Agents_Management_System.Models
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public string Description { get; set; }
+        public string Position { get; set; }
 
-        [NotMapped]
-        public PinLocation Location { get; set; }
+       
+        public PinLocation? Location { get; set; }
+
+        public string PotoUrl { get; set; }
 
         public bool Status { get; set; }
     }

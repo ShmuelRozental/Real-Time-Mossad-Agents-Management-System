@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Real_Time_Mossad_Agents_Management_System.Data;
+using Real_Time_Mossad_Agents_Management_System.Enums;
 using Real_Time_Mossad_Agents_Management_System.Models;
 
 namespace Real_Time_Mossad_Agents_Management_System.Controllers
@@ -96,6 +97,88 @@ namespace Real_Time_Mossad_Agents_Management_System.Controllers
             await _context.SaveChangesAsync();
 
             return NoContent();
+        }
+
+        //PUT: api/5/pin
+        [HttpPut("{id}/pin")]
+        public IActionResult SetInitialPosition(int id, [FromBody] PinLocation location)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            var target = _context.Targets.Find(id);
+            if (target == null)
+            {
+                return NotFound();
+            }
+
+            if (target.Location == null)
+            {
+                target.Location = new PinLocation();
+            }
+            target.Location.X = location.X;
+            target.Location.Y = location.Y;
+
+            _context.SaveChanges();
+
+            return Ok(target);
+        }
+
+        //PUT: api/5/move
+        [HttpPut("{id}/move")]
+        public IActionResult MoveTarget(int id, [FromBody] string directionString)
+        {
+            var target = _context.Targets.Find(id);
+            if (target == null)
+            {
+                return NotFound();
+            }
+
+            if (!Enum.TryParse<Direction>(directionString, true, out var direction))
+            {
+                return BadRequest("Invalid direction value.");
+            }
+
+            if (target.Location == null)
+            {
+                target.Location = new PinLocation();
+            }
+
+            switch (direction)
+            {
+                case Direction.NW:
+                    target.Location.X -= 1;
+                    target.Location.Y += 1;
+                    break;
+                case Direction.N:
+                    target.Location.Y += 1;
+                    break;
+                case Direction.NE:
+                    target.Location.X += 1;
+                    target.Location.Y += 1;
+                    break;
+                case Direction.W:
+                    target.Location.X -= 1;
+                    break;
+                case Direction.E:
+                    target.Location.X += 1;
+                    break;
+                case Direction.SW:
+                    target.Location.X -= 1;
+                    target.Location.Y -= 1;
+                    break;
+                case Direction.S:
+                    target.Location.Y -= 1;
+                    break;
+                case Direction.SE:
+                    target.Location.X += 1;
+                    target.Location.Y -= 1;
+                    break;
+            }
+
+            _context.SaveChanges();
+            return Ok(target);
         }
 
         private bool TargetExists(int id)

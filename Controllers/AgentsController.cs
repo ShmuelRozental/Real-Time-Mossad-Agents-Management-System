@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Real_Time_Mossad_Agents_Management_System.Data;
+using Real_Time_Mossad_Agents_Management_System.Enums;
 using Real_Time_Mossad_Agents_Management_System.Models;
 
 namespace Real_Time_Mossad_Agents_Management_System.Controllers
@@ -97,6 +98,89 @@ namespace Real_Time_Mossad_Agents_Management_System.Controllers
 
             return NoContent();
         }
+
+        //PUT: api/5/pin
+        [HttpPut("{id}/pin")]
+        public IActionResult SetInitialPosition(int id, [FromBody] PinLocation location)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            var agent = _context.Targets.Find(id);
+            if (agent == null)
+            {
+                return NotFound();
+            }
+
+            if (agent.Location == null)
+            {
+                agent.Location = new PinLocation();
+            }
+            agent.Location.X = location.X;
+            agent.Location.Y = location.Y;
+
+            _context.SaveChanges();
+
+            return Ok(agent);
+        }
+
+        //PUT: api/5/move
+        [HttpPut("{id}/move")]
+        public IActionResult MoveAgent(int id, [FromBody] string directionString)
+        {
+            var agent = _context.Targets.Find(id);
+            if (agent == null)
+            {
+                return NotFound();
+            }
+
+            if (!Enum.TryParse<Direction>(directionString, true, out var direction))
+            {
+                return BadRequest("Invalid direction value.");
+            }
+
+            if (agent.Location == null)
+            {
+                agent.Location = new PinLocation();
+            }
+
+            switch (direction)
+            {
+                case Direction.NW:
+                    agent.Location.X -= 1;
+                    agent.Location.Y += 1;
+                    break;
+                case Direction.N:
+                    agent.Location.Y += 1;
+                    break;
+                case Direction.NE:
+                    agent.Location.X += 1;
+                    agent.Location.Y += 1;
+                    break;
+                case Direction.W:
+                    agent.Location.X -= 1;
+                    break;
+                case Direction.E:
+                    agent.Location.X += 1;
+                    break;
+                case Direction.SW:
+                    agent.Location.X -= 1;
+                    agent.Location.Y -= 1;
+                    break;
+                case Direction.S:
+                    agent.Location.Y -= 1;
+                    break;
+                case Direction.SE:
+                    agent.Location.X += 1;
+                    agent.Location.Y -= 1;
+                    break;
+            }
+
+            _context.SaveChanges();
+            return Ok(agent);
+        }
+
 
         private bool AgentExists(int id)
         {

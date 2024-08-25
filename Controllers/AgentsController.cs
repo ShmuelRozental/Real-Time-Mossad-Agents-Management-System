@@ -11,7 +11,7 @@ using Real_Time_Mossad_Agents_Management_System.Models;
 
 namespace Real_Time_Mossad_Agents_Management_System.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("agents")]
     [ApiController]
     public class AgentsController : ControllerBase
     {
@@ -107,7 +107,7 @@ namespace Real_Time_Mossad_Agents_Management_System.Controllers
             {
                 return BadRequest(ModelState);
             }
-            var agent = _context.Targets.Find(id);
+            var agent = _context.Agents.Find(id);
             if (agent == null)
             {
                 return NotFound();
@@ -149,31 +149,31 @@ namespace Real_Time_Mossad_Agents_Management_System.Controllers
             {
                 case Direction.NW:
                     agent.Location.X -= 1;
-                    agent.Location.Y += 1;
+                    agent.Location.Y -= 1;
                     break;
                 case Direction.N:
-                    agent.Location.Y += 1;
+                    agent.Location.Y -= 1;
                     break;
                 case Direction.NE:
-                    agent.Location.X += 1;
+                    agent.Location.X -= 1;
                     agent.Location.Y += 1;
                     break;
                 case Direction.W:
-                    agent.Location.X -= 1;
+                    agent.Location.y -= 1;
                     break;
                 case Direction.E:
-                    agent.Location.X += 1;
+                    agent.Location.y += 1;
                     break;
                 case Direction.SW:
-                    agent.Location.X -= 1;
+                    agent.Location.X += 1;
                     agent.Location.Y -= 1;
                     break;
                 case Direction.S:
-                    agent.Location.Y -= 1;
+                    agent.Location.Y += 1;
                     break;
                 case Direction.SE:
                     agent.Location.X += 1;
-                    agent.Location.Y -= 1;
+                    agent.Location.Y += 1;
                     break;
             }
 
@@ -182,7 +182,7 @@ namespace Real_Time_Mossad_Agents_Management_System.Controllers
         }
 
 
-        private bool AgentExists(int id)
+    private bool AgentExists(int id)
         {
             return _context.Agents.Any(e => e.Id == id);
         }

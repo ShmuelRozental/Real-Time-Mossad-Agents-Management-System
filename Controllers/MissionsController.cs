@@ -98,6 +98,11 @@ namespace Real_Time_Mossad_Agents_Management_System.Controllers
             return NoContent();
         }
 
+
+       
+
+        [HttpPost("/update")]
+
         private bool MissionExists(int id)
         {
             return _context.Missions.Any(e => e.Id == id);

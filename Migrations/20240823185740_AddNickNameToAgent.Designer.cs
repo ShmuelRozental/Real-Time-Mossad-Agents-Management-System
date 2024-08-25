@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Real_Time_Mossad_Agents_Management_System.Data;
 
@@ -11,9 +12,11 @@ using Real_Time_Mossad_Agents_Management_System.Data;
 namespace Real_Time_Mossad_Agents_Management_System.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240823185740_AddNickNameToAgent")]
+    partial class AddNickNameToAgent
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -30,16 +33,12 @@ namespace Real_Time_Mossad_Agents_Management_System.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("NickName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool>("Status")
                         .HasColumnType("bit");
-
-                    b.Property<string>("nickname")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("photoUrl")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -91,40 +90,16 @@ namespace Real_Time_Mossad_Agents_Management_System.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("Status")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("photoUrl")
+                    b.Property<string>("PotoUrl")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("Status")
+                        .HasColumnType("bit");
 
                     b.HasKey("Id");
 
                     b.ToTable("Targets");
-                });
-
-            modelBuilder.Entity("Real_Time_Mossad_Agents_Management_System.Models.Agent", b =>
-                {
-                    b.OwnsOne("Real_Time_Mossad_Agents_Management_System.Models.PinLocation", "Location", b1 =>
-                        {
-                            b1.Property<int>("AgentId")
-                                .HasColumnType("int");
-
-                            b1.Property<int>("X")
-                                .HasColumnType("int");
-
-                            b1.Property<int>("Y")
-                                .HasColumnType("int");
-
-                            b1.HasKey("AgentId");
-
-                            b1.ToTable("Agents");
-
-                            b1.WithOwner()
-                                .HasForeignKey("AgentId");
-                        });
-
-                    b.Navigation("Location");
                 });
 
             modelBuilder.Entity("Real_Time_Mossad_Agents_Management_System.Models.Mission", b =>

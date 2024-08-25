@@ -7,19 +7,23 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Real_Time_Mossad_Agents_Management_System.Data;
 using Real_Time_Mossad_Agents_Management_System.Enums;
+using Real_Time_Mossad_Agents_Management_System.Interface;
 using Real_Time_Mossad_Agents_Management_System.Models;
+using Real_Time_Mossad_Agents_Management_System.services;
 
 namespace Real_Time_Mossad_Agents_Management_System.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("targets")]
     [ApiController]
     public class TargetsController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly IAgentTargetService _agentTargetService;
 
-        public TargetsController(ApplicationDbContext context)
+        public TargetsController(ApplicationDbContext context, IAgentTargetService agentTargetService)
         {
             _context = context;
+            _agentTargetService = agentTargetService;
         }
 
         // GET: api/Targets
@@ -98,8 +102,7 @@ namespace Real_Time_Mossad_Agents_Management_System.Controllers
 
             return NoContent();
         }
-
-        //PUT: api/5/pin
+        // PUT: api/5/pin
         [HttpPut("{id}/pin")]
         public IActionResult SetInitialPosition(int id, [FromBody] PinLocation location)
         {
@@ -107,12 +110,14 @@ namespace Real_Time_Mossad_Agents_Management_System.Controllers
             {
                 return BadRequest(ModelState);
             }
+
             var target = _context.Targets.Find(id);
             if (target == null)
             {
                 return NotFound();
             }
 
+            // Update location
             if (target.Location == null)
             {
                 target.Location = new PinLocation();
@@ -120,12 +125,20 @@ namespace Real_Time_Mossad_Agents_Management_System.Controllers
             target.Location.X = location.X;
             target.Location.Y = location.Y;
 
-            _context.SaveChanges();
+            try
+            {
+                _context.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                // Log exception
+                return StatusCode(500, "Internal server error.");
+            }
 
             return Ok(target);
         }
 
-        //PUT: api/5/move
+        // PUT: api/5/move
         [HttpPut("{id}/move")]
         public IActionResult MoveTarget(int id, [FromBody] string directionString)
         {
@@ -140,6 +153,7 @@ namespace Real_Time_Mossad_Agents_Management_System.Controllers
                 return BadRequest("Invalid direction value.");
             }
 
+            // Update location
             if (target.Location == null)
             {
                 target.Location = new PinLocation();
@@ -177,7 +191,17 @@ namespace Real_Time_Mossad_Agents_Management_System.Controllers
                     break;
             }
 
-            _context.SaveChanges();
+            try
+            {
+                _context.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                // Log exception
+                return StatusCode(500, "Internal server error.");
+            }
+
+            _agentTargetService.CheckAndUpdateAssignments(target);
             return Ok(target);
         }
 

@@ -17,7 +17,7 @@ namespace Real_Time_Mossad_Agents_Management_System.services
 
         public void CheckAndUpdateAssignments(Agent agent)
         {
-            // Use the existing context
+           
             var targets = _context.Targets.ToList();
             foreach (var target in targets)
             {

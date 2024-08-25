@@ -159,10 +159,10 @@ namespace Real_Time_Mossad_Agents_Management_System.Controllers
                     agent.Location.Y += 1;
                     break;
                 case Direction.W:
-                    agent.Location.y -= 1;
+                    agent.Location.Y -= 1;
                     break;
                 case Direction.E:
-                    agent.Location.y += 1;
+                    agent.Location.Y += 1;
                     break;
                 case Direction.SW:
                     agent.Location.X += 1;

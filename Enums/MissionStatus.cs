@@ -3,7 +3,7 @@
     public enum MissionStatus
     {
         Offer,    
-        Active,  
+        Assignd,  
         Finished
     }
 }

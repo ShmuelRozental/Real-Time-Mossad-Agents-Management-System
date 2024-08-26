@@ -11,180 +11,125 @@ using Real_Time_Mossad_Agents_Management_System.Models;
 
 namespace Real_Time_Mossad_Agents_Management_System.Controllers
 {
-    [Route("agents")]
+    [Route("api/[controller]")]
     [ApiController]
     public class AgentsController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
+        private readonly AgentsServices _agentsServices;
 
-        public AgentsController(ApplicationDbContext context)
+        public AgentsController(AgentsServices agentsServices)
         {
-            _context = context;
+            _agentsServices = agentsServices;
         }
 
         // GET: api/Agents
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Agent>>> GetAgents()
         {
-            return await _context.Agents.ToListAsync();
+            try
+            {
+                var agents = await _agentsServices.GetAllEntityAsync();
+                return Ok(agents);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
 
         // GET: api/Agents/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Agent>> GetAgent(int id)
         {
-            var agent = await _context.Agents.FindAsync(id);
-
-            if (agent == null)
-            {
-                return NotFound();
-            }
-
-            return agent;
-        }
-
-        // PUT: api/Agents/5
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutAgent(int id, Agent agent)
-        {
-            if (id != agent.Id)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(agent).State = EntityState.Modified;
-
             try
             {
-                await _context.SaveChangesAsync();
+                var agent = await _agentsServices.GetEntityAsync(id);
+                return Ok(agent);
             }
-            catch (DbUpdateConcurrencyException)
+            catch (KeyNotFoundException)
             {
-                if (!AgentExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                return NotFound("Agent not found.");
             }
-
-            return NoContent();
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
 
         // POST: api/Agents
         [HttpPost]
         public async Task<ActionResult<int>> PostAgent(Agent agent)
         {
-            _context.Agents.Add(agent);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetAgent", new { id = agent.Id }, agent.Id);
-        }
-
-        // DELETE: api/Agents/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteAgent(int id)
-        {
-            var agent = await _context.Agents.FindAsync(id);
-            if (agent == null)
+            if (!ModelState.IsValid)
             {
-                return NotFound();
+                return BadRequest(ModelState);
             }
 
-            _context.Agents.Remove(agent);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
+            try
+            {
+                var createdAgent = await _agentsServices.CreateEntity(agent);
+                return CreatedAtAction(nameof(GetAgent), new { id = createdAgent.Id }, createdAgent.Id);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
 
-        //PUT: api/5/pin
+        // PUT: api/Agents/5/pin
         [HttpPut("{id}/pin")]
-        public IActionResult SetInitialPosition(int id, [FromBody] PinLocation location)
+        public async Task<IActionResult> SetInitialPosition(int id, [FromBody] Location location)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-            var agent = _context.Agents.Find(id);
-            if (agent == null)
+
+            try
             {
-                return NotFound();
+                var agent = await _agentsServices.SetEntityLocation(id, location);
+                return Ok(agent);
             }
-
-            if (agent.Location == null)
+            catch (KeyNotFoundException)
             {
-                agent.Location = new PinLocation();
+                return NotFound("Agent not found.");
             }
-            agent.Location.X = location.X;
-            agent.Location.Y = location.Y;
-
-            _context.SaveChanges();
-
-            return Ok(agent);
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
 
-        //PUT: api/5/move
+        // PUT: api/Agents/5/move
         [HttpPut("{id}/move")]
-        public IActionResult MoveAgent(int id, [FromBody] string directionString)
+        public async Task<IActionResult> MoveAgent(int id, [FromBody] string directionString)
         {
-            var agent = _context.Targets.Find(id);
-            if (agent == null)
-            {
-                return NotFound();
-            }
-
             if (!Enum.TryParse<Direction>(directionString, true, out var direction))
             {
                 return BadRequest("Invalid direction value.");
             }
 
-            if (agent.Location == null)
+            try
             {
-                agent.Location = new PinLocation();
+                var agent = await _agentsServices.EntityMovement(id, direction);
+                return Ok(agent);
             }
-
-            switch (direction)
+            catch (KeyNotFoundException)
             {
-                case Direction.NW:
-                    agent.Location.X -= 1;
-                    agent.Location.Y -= 1;
-                    break;
-                case Direction.N:
-                    agent.Location.Y -= 1;
-                    break;
-                case Direction.NE:
-                    agent.Location.X -= 1;
-                    agent.Location.Y += 1;
-                    break;
-                case Direction.W:
-                    agent.Location.Y -= 1;
-                    break;
-                case Direction.E:
-                    agent.Location.Y += 1;
-                    break;
-                case Direction.SW:
-                    agent.Location.X += 1;
-                    agent.Location.Y -= 1;
-                    break;
-                case Direction.S:
-                    agent.Location.Y += 1;
-                    break;
-                case Direction.SE:
-                    agent.Location.X += 1;
-                    agent.Location.Y += 1;
-                    break;
+                return NotFound("Agent not found.");
             }
-
-            _context.SaveChanges();
-            return Ok(agent);
-        }
-
-
-    private bool AgentExists(int id)
-        {
-            return _context.Agents.Any(e => e.Id == id);
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
     }
 }

@@ -10,7 +10,7 @@ using Real_Time_Mossad_Agents_Management_System.Data;
 
 namespace Real_Time_Mossad_Agents_Management_System.Migrations
 {
-    [DbContext(typeof(ApplicationDbContext))]
+    [DbContext(typeof(AppDbContext))]
     partial class ApplicationDbContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)

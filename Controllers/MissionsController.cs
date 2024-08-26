@@ -6,106 +6,71 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Real_Time_Mossad_Agents_Management_System.Data;
+using Real_Time_Mossad_Agents_Management_System.Enums;
 using Real_Time_Mossad_Agents_Management_System.Models;
 
 namespace Real_Time_Mossad_Agents_Management_System.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class MissionsController : ControllerBase
+    public class MissionsController<T> : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
+        private readonly AppDbContext _dbContext;
+        private readonly MissionsServices<T> _missionsServices;
 
-        public MissionsController(ApplicationDbContext context)
+
+        public MissionsController(AppDbContext dbContext, MissionsServices<T> missionsServices)
         {
-            _context = context;
+            _dbContext = dbContext;
+            _missionsServices = missionsServices;
+
         }
 
         // GET: api/Missions
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Mission>>> GetMissions()
         {
-            return await _context.Missions.ToListAsync();
+            try
+            {
+                var missions = await _missionsServices.GetAllAsync();
+                return Ok(_missionsServices);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
 
         // GET: api/Missions/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Mission>> GetMission(int id)
+        public async Task<ActionResult<Mission>> GetMission(int missionId)
         {
-            var mission = await _context.Missions.FindAsync(id);
+            var missions = await _missionsServices.GetAsync(missionId);
 
-            if (mission == null)
+            if (missions == null)
             {
                 return NotFound();
             }
 
-            return mission;
+            return Ok(missions);
         }
 
         // PUT: api/Missions/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutMission(int id, Mission mission)
+        public async Task<ActionResult> MissionAssignedment(int missionId, [FromBody] MissionStatus status)
         {
-            if (id != mission.Id)
-            {
-                return BadRequest();
-            }
+            await _missionsServices.UpdateStatus(missionId, status);
 
-            _context.Entry(mission).State = EntityState.Modified;
+            return Ok();
 
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!MissionExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
         }
 
-        // POST: api/Missions
-        [HttpPost]
-        public async Task<ActionResult<Mission>> PostMission(Mission mission)
+        //POST: api/Missions/Update
+        [HttpPost("Update")]
+        public async Task<ActionResult> UpdateMissions()
         {
-            _context.Missions.Add(mission);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetMission", new { id = mission.Id }, mission);
-        }
-
-        // DELETE: api/Missions/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteMission(int id)
-        {
-            var mission = await _context.Missions.FindAsync(id);
-            if (mission == null)
-            {
-                return NotFound();
-            }
-
-            _context.Missions.Remove(mission);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
-
-
-       
-
-        [HttpPost("/update")]
-
-        private bool MissionExists(int id)
-        {
-            return _context.Missions.Any(e => e.Id == id);
+            await _missionsServices.StartMissionsAsync();
+            return Ok();
         }
     }
 }

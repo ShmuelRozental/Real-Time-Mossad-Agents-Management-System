@@ -1,3 +1,0 @@
-﻿<Project>
-  <Import Project="..\buildMultiTargeting\Real-Time Mossad Agents Management System.props" />
-</Project>

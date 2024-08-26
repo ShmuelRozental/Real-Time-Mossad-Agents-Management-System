@@ -1,16 +1,21 @@
 using Microsoft.EntityFrameworkCore;
 using Real_Time_Mossad_Agents_Management_System.Data;
-using Real_Time_Mossad_Agents_Management_System.Interface;
-using Real_Time_Mossad_Agents_Management_System.services;
+using Real_Time_Mossad_Agents_Management_System.Interfaces;
+using Real_Time_Mossad_Agents_Management_System.Models;
+using Real_Time_Mossad_Agents_Management_System.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
+builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-builder.Services.AddScoped<IAgentTargetService, AgentTargetService>();
+builder.Services.AddScoped(typeof(IManagementService<>), typeof(ManagementService<>));
+builder.Services.AddScoped(typeof(IManagementService<>), typeof(MissionsService<>));
+builder.Services.AddScoped<AgentsServices>();
+
 builder.Services.AddControllers();
+// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -23,21 +28,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-// Add custom logging middleware
-app.Use(async (context, next) =>
-{
-    // Log request details
-    Console.WriteLine($"[{context.Request.Method}] {context.Request.Path} started at {DateTime.UtcNow}");
-
-    // Call the next middleware in the pipeline
-    await next(context);
-
-    // Log response details
-    Console.WriteLine($"[{context.Request.Method}] {context.Request.Path} finished at {DateTime.UtcNow} with status code {context.Response.StatusCode}");
-});
-
 app.UseHttpsRedirection();
+
 app.UseAuthorization();
+
 app.MapControllers();
 
 app.Run();

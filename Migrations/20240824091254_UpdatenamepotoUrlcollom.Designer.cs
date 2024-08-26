@@ -11,7 +11,7 @@ using Real_Time_Mossad_Agents_Management_System.Data;
 
 namespace Real_Time_Mossad_Agents_Management_System.Migrations
 {
-    [DbContext(typeof(ApplicationDbContext))]
+    [DbContext(typeof(AppDbContext))]
     [Migration("20240824091254_UpdatenamepotoUrlcollom")]
     partial class UpdatenamepotoUrlcollom
     {

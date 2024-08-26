@@ -12,6 +12,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddScoped(typeof(IManagementServices<>), typeof(ManagementServices<>));
 builder.Services.AddScoped(typeof(IManagementServices<>), typeof(ManagementServices<>));
 builder.Services.AddScoped<AgentsServices>();
+builder.Services.AddScoped<TargetsServices>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

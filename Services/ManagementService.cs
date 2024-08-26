@@ -1,11 +1,12 @@
-﻿using Real_Time_Mossad_Agents_Management_System.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using Real_Time_Mossad_Agents_Management_System.Data;
 using Real_Time_Mossad_Agents_Management_System.Enums;
-using Real_Time_Mossad_Agents_Management_System.Interface.MissionsManagement.Interfaces;
+using Real_Time_Mossad_Agents_Management_System.Interfaces;
 using Real_Time_Mossad_Agents_Management_System.Models;
 using System;
 using System.Drawing;
 
-namespace Real_Time_Mossad_Agents_Management_System.services
+namespace Real_Time_Mossad_Agents_Management_System.Services
 {
     public class ManagementServices<T> : IManagementServices<T>
         {

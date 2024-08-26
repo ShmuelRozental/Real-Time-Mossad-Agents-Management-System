@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Real_Time_Mossad_Agents_Management_System.Data;
 using Real_Time_Mossad_Agents_Management_System.Interfaces;
+using Real_Time_Mossad_Agents_Management_System.Interfaces;
 using Real_Time_Mossad_Agents_Management_System.Models;
 using Real_Time_Mossad_Agents_Management_System.Services;
 
@@ -10,8 +11,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-builder.Services.AddScoped(typeof(IManagementService<>), typeof(ManagementService<>));
-builder.Services.AddScoped(typeof(IManagementService<>), typeof(MissionsService<>));
+builder.Services.AddScoped(typeof(IManagementServices<>), typeof(ManagementService<>));
+builder.Services.AddScoped(typeof(IManagementServices<>), typeof(MissionsService<>));
 builder.Services.AddScoped<AgentsServices>();
 
 builder.Services.AddControllers();

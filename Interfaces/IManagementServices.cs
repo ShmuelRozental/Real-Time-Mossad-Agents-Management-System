@@ -1,11 +1,8 @@
 ﻿using Real_Time_Mossad_Agents_Management_System.Enums;
 using Real_Time_Mossad_Agents_Management_System.Models;
 
-namespace Real_Time_Mossad_Agents_Management_System.Interface
+namespace Real_Time_Mossad_Agents_Management_System.Interfaces
 {
-
-    namespace MissionsManagement.Interfaces
-    {
         public interface IManagementServices<T>
         {
             bool IsWithinDistance(Location agentLocation, Location targetLocation);
@@ -14,6 +11,5 @@ namespace Real_Time_Mossad_Agents_Management_System.Interface
             Task TryDeleteMissionAsync(T entity1);
             Task StartMissionAsync(Mission mission);
         }
-    }
-
+   
 }

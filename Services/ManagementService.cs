@@ -11,12 +11,10 @@ namespace Real_Time_Mossad_Agents_Management_System.Services
     public class ManagementServices<T> : IManagementServices<T>
     {
         private readonly AppDbContext _dbContext;
-        private readonly MissionsServices<T> _missionsServices;
 
-        public ManagementServices(AppDbContext dbContext, MissionsServices<T> missionServices)
+        public ManagementServices(AppDbContext dbContext)
         {
             _dbContext = dbContext;
-            _missionsServices = missionServices;
         }
 
         public bool IsWithinDistance(Location agentLocation, Location targetLocation)
@@ -46,6 +44,45 @@ namespace Real_Time_Mossad_Agents_Management_System.Services
             return Math.Sqrt(Math.Pow(x2 - x1, 2) + Math.Pow(y2 - y1, 2));
         }
 
+
+        public async Task<Mission> CreateAsync(Agent agent, Target target)
+        {
+            var existingMission = await _dbContext.Missions
+                .FirstOrDefaultAsync(m => m.AgentId == agent.Id && m.TargetId == target.Id);
+
+            if (existingMission != null)
+            {
+                return existingMission;
+            }
+            try
+            {
+                Mission newMission = new Mission()
+                {
+                    AgentId = agent.Id,
+                    TargetId = target.Id,
+                    Status = MissionStatus.Offer
+                };
+                await _dbContext.Missions.AddAsync(newMission);
+                await _dbContext.SaveChangesAsync();
+                return newMission;
+            }
+            catch (DbUpdateException ex)
+            {
+                throw new InvalidOperationException("Error saving Mission to the database.", ex);
+            }
+        }
+
+        public async Task DeleteMissionAsync(int missionId)
+        {
+            var mission = await _dbContext.Missions.FindAsync(missionId);
+            if (mission == null)
+            {
+                throw new KeyNotFoundException("mission not found.");
+            }
+            _dbContext.Remove(mission);
+            await _dbContext.SaveChangesAsync();
+        }
+
         public async Task TryCreateMissionAsync(T entity)
         {
             switch (entity)
@@ -63,7 +100,7 @@ namespace Real_Time_Mossad_Agents_Management_System.Services
                             )
                             && !hasTargetWhitAsignMission)
                         {
-                            await _missionsServices.CreateAsync(agent, target);
+                            await CreateAsync(agent, target);
                         }
                     }
                     break;
@@ -80,7 +117,7 @@ namespace Real_Time_Mossad_Agents_Management_System.Services
                         if (IsWithinDistance(target.Location, agent.Location))
                         {
 
-                            await _missionsServices.CreateAsync(agent, target);
+                            await CreateAsync(agent, target);
                         }
                     }
                     break;
@@ -101,7 +138,7 @@ namespace Real_Time_Mossad_Agents_Management_System.Services
 
                         if (mision.Status == MissionStatus.Offer && !IsWithinDistance(mision.Agent.Location, target.Location))
                         {
-                            await _missionsServices.DeleteMissionAsync(mision.Id);
+                            await DeleteMissionAsync(mision.Id);
                         }
                     }
                     break;
@@ -114,7 +151,7 @@ namespace Real_Time_Mossad_Agents_Management_System.Services
 
                         if (mision.Status == MissionStatus.Offer && !IsWithinDistance(mision.Target.Location, agent.Location))
                         {
-                            await _missionsServices.DeleteMissionAsync(mision.Id);
+                            await DeleteMissionAsync(mision.Id);
                         }
                     }
                     break;

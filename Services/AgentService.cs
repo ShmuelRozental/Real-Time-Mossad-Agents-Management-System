@@ -10,12 +10,12 @@ namespace Real_Time_Mossad_Agents_Management_System.Services
     {
 
         private readonly AppDbContext _dbContext;
-        //private readonly IManagementServices<Agent> _managementServices;
+        private readonly IManagementServices<Agent> _managementServices;
 
-        public AgentsServices(AppDbContext context/*, IManagementServices<Agent> managementServices*/)
+        public AgentsServices(AppDbContext context, IManagementServices<Agent> managementServices)
         {
             _dbContext = context;
-            //_managementServices = managementServices;
+            _managementServices = managementServices;
         }
 
 
@@ -73,7 +73,7 @@ namespace Real_Time_Mossad_Agents_Management_System.Services
             };
 
             await _dbContext.SaveChangesAsync();
-            //await _managementServices.TryCreateMissionAsync(agent);
+            await _managementServices.TryCreateMissionAsync(agent);
             return agent;
         }
 
@@ -96,7 +96,7 @@ namespace Real_Time_Mossad_Agents_Management_System.Services
 
             _dbContext.Update(agent);
             await _dbContext.SaveChangesAsync();
-            //await _managementServices.TryCreateMissionAsync(agent);
+            await _managementServices.TryCreateMissionAsync(agent);
             return agent;
         }
     }

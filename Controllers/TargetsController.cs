@@ -14,7 +14,7 @@ using Real_Time_Mossad_Agents_Management_System.Services;
 namespace Real_Time_Mossad_Agents_Management_System.Controllers
 {
 
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     [ApiController]
     public class TargetsController : ControllerBase
     {
@@ -27,21 +27,24 @@ namespace Real_Time_Mossad_Agents_Management_System.Controllers
 
         }
 
-        // GET: api/Targets
+        // GET: Targets
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Target>>> GetTargets()
         {
-            var agents = await _targetstsServices.GetAllEntityAsync();
-
-            if (agents == null || !agents.Any())
+            try
             {
-                return Ok(new List<Target>());
+                var target = await _targetstsServices.GetAllEntityAsync();
+                return Ok(target);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
             }
 
-            return Ok(agents);
         }
 
-        // GET: api/Targets/5
+
+        // GET: Targets/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Target>> GetTarget(int id)
         {
@@ -55,7 +58,7 @@ namespace Real_Time_Mossad_Agents_Management_System.Controllers
             return Ok(target);
         }
 
-        // POST: api/Targets
+        // POST: Targets
         [HttpPost]
         public async Task<ActionResult<int>> PostTarget(Target target)
         {
@@ -66,8 +69,9 @@ namespace Real_Time_Mossad_Agents_Management_System.Controllers
 
             try
             {
-                await _targetstsServices.CreateEntity(target);
-                return CreatedAtAction(nameof(GetTarget), new { id = target.Id }, target.Id);
+                var createdTarget =await _targetstsServices.CreateEntity(target);
+                return StatusCode(StatusCodes.Status201Created, new { Id = target.Id });
+
             }
             catch (Exception ex)
             {
@@ -75,7 +79,7 @@ namespace Real_Time_Mossad_Agents_Management_System.Controllers
             }
         }
 
-        // PUT: api/5/pin
+        // PUT: 5/pin
         [HttpPut("{id}/pin")]
         public async Task<IActionResult> SetInitialPosition(int id, [FromBody] Location location)
         {
@@ -100,7 +104,7 @@ namespace Real_Time_Mossad_Agents_Management_System.Controllers
             }
         }
 
-        // PUT: api/Targets/5/move
+        // PUT: Targets/5/move
         [HttpPut("{id}/move")]
         public async Task<IActionResult> MoveTarget(int id, [FromBody] string directionString)
         {

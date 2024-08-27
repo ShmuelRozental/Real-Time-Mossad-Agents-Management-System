@@ -3,7 +3,6 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Real_Time_Mossad_Agents_Management_System.Data;
 
@@ -12,11 +11,9 @@ using Real_Time_Mossad_Agents_Management_System.Data;
 namespace Real_Time_Mossad_Agents_Management_System.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240823190937_UpdatePropertyMapping")]
-    partial class UpdatePropertyMapping
+    partial class AppDbContextModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -33,12 +30,14 @@ namespace Real_Time_Mossad_Agents_Management_System.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("NickName")
-                        .IsRequired()
+                    b.Property<bool>("ActiveStatus")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("nickname")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("Status")
-                        .HasColumnType("bit");
+                    b.Property<string>("photoUrl")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -82,29 +81,35 @@ namespace Real_Time_Mossad_Agents_Management_System.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Position")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PotoUrl")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<bool>("Status")
                         .HasColumnType("bit");
+
+                    b.Property<string>("name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("photoUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
                     b.ToTable("Targets");
                 });
 
+            modelBuilder.Entity("Real_Time_Mossad_Agents_Management_System.Models.User", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Users");
+                });
+
             modelBuilder.Entity("Real_Time_Mossad_Agents_Management_System.Models.Agent", b =>
                 {
-                    b.OwnsOne("Real_Time_Mossad_Agents_Management_System.Models.PinLocation", "Location", b1 =>
+                    b.OwnsOne("Real_Time_Mossad_Agents_Management_System.Models.Location", "Location", b1 =>
                         {
                             b1.Property<int>("AgentId")
                                 .HasColumnType("int");
@@ -147,7 +152,7 @@ namespace Real_Time_Mossad_Agents_Management_System.Migrations
 
             modelBuilder.Entity("Real_Time_Mossad_Agents_Management_System.Models.Target", b =>
                 {
-                    b.OwnsOne("Real_Time_Mossad_Agents_Management_System.Models.PinLocation", "Location", b1 =>
+                    b.OwnsOne("Real_Time_Mossad_Agents_Management_System.Models.Location", "Location", b1 =>
                         {
                             b1.Property<int>("TargetId")
                                 .HasColumnType("int");

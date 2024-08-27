@@ -17,8 +17,11 @@ namespace Real_Time_Mossad_Agents_Management_System.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    NikName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Status = table.Column<bool>(type: "bit", nullable: false)
+                    nickname = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    photoUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Location_X = table.Column<int>(type: "int", nullable: true),
+                    Location_Y = table.Column<int>(type: "int", nullable: true),
+                    ActiveStatus = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -31,13 +34,26 @@ namespace Real_Time_Mossad_Agents_Management_System.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    photoUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Location_X = table.Column<int>(type: "int", nullable: true),
+                    Location_Y = table.Column<int>(type: "int", nullable: true),
                     Status = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Targets", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Users",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Users", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -47,6 +63,8 @@ namespace Real_Time_Mossad_Agents_Management_System.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     AgentId = table.Column<int>(type: "int", nullable: false),
+                    TargetId = table.Column<int>(type: "int", nullable: false),
+                    Status = table.Column<int>(type: "int", nullable: false),
                     TimeLeft = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
@@ -58,12 +76,23 @@ namespace Real_Time_Mossad_Agents_Management_System.Migrations
                         principalTable: "Agents",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Missions_Targets_TargetId",
+                        column: x => x.TargetId,
+                        principalTable: "Targets",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Missions_AgentId",
                 table: "Missions",
                 column: "AgentId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Missions_TargetId",
+                table: "Missions",
+                column: "TargetId");
         }
 
         /// <inheritdoc />
@@ -73,10 +102,13 @@ namespace Real_Time_Mossad_Agents_Management_System.Migrations
                 name: "Missions");
 
             migrationBuilder.DropTable(
-                name: "Targets");
+                name: "Users");
 
             migrationBuilder.DropTable(
                 name: "Agents");
+
+            migrationBuilder.DropTable(
+                name: "Targets");
         }
     }
 }

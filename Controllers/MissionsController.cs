@@ -12,15 +12,15 @@ using Real_Time_Mossad_Agents_Management_System.Services;
 
 namespace Real_Time_Mossad_Agents_Management_System.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     [ApiController]
-    public class MissionsController<T> : ControllerBase
+    public class MissionsController : ControllerBase
     {
         private readonly AppDbContext _dbContext;
-        private readonly MissionsServices<T> _missionsServices;
+        private readonly MissionsServices<Mission> _missionsServices;
 
 
-        public MissionsController(AppDbContext dbContext, MissionsServices<T> missionsServices)
+        public MissionsController(AppDbContext dbContext, MissionsServices<Mission> missionsServices)
         {
             _dbContext = dbContext;
             _missionsServices = missionsServices;

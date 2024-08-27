@@ -12,7 +12,7 @@ using Real_Time_Mossad_Agents_Management_System.Services;
 
 namespace Real_Time_Mossad_Agents_Management_System.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     [ApiController]
     public class AgentsController : ControllerBase
     {
@@ -38,7 +38,7 @@ namespace Real_Time_Mossad_Agents_Management_System.Controllers
             }
         }
 
-        // GET: api/Agents/5
+        // GET: Agents/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Agent>> GetAgent(int id)
         {
@@ -57,7 +57,7 @@ namespace Real_Time_Mossad_Agents_Management_System.Controllers
             }
         }
 
-        // POST: api/Agents
+        // POST: Agents
         [HttpPost]
         public async Task<ActionResult<int>> PostAgent(Agent agent)
         {
@@ -69,7 +69,7 @@ namespace Real_Time_Mossad_Agents_Management_System.Controllers
             try
             {
                 var createdAgent = await _agentsServices.CreateEntity(agent);
-                return CreatedAtAction(nameof(GetAgent), new { id = createdAgent.Id }, createdAgent.Id);
+                return StatusCode(StatusCodes.Status201Created, new { Id = agent.Id });
             }
             catch (Exception ex)
             {
@@ -77,7 +77,7 @@ namespace Real_Time_Mossad_Agents_Management_System.Controllers
             }
         }
 
-        // PUT: api/Agents/5/pin
+        // PUT: Agents/5/pin
         [HttpPut("{id}/pin")]
         public async Task<IActionResult> SetInitialPosition(int id, [FromBody] Location location)
         {
@@ -105,7 +105,7 @@ namespace Real_Time_Mossad_Agents_Management_System.Controllers
             }
         }
 
-        // PUT: api/Agents/5/move
+        // PUT: Agents/5/move
         [HttpPut("{id}/move")]
         public async Task<IActionResult> MoveAgent(int id, [FromBody] string directionString)
         {

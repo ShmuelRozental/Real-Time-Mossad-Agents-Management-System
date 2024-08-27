@@ -12,7 +12,7 @@ using Real_Time_Mossad_Agents_Management_System.Data;
 namespace Real_Time_Mossad_Agents_Management_System.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240821091553_InitialCreate")]
+    [Migration("20240827063114_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -33,12 +33,14 @@ namespace Real_Time_Mossad_Agents_Management_System.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("NikName")
-                        .IsRequired()
+                    b.Property<bool>("ActiveStatus")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("nickname")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("Status")
-                        .HasColumnType("bit");
+                    b.Property<string>("photoUrl")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -56,12 +58,20 @@ namespace Real_Time_Mossad_Agents_Management_System.Migrations
                     b.Property<int>("AgentId")
                         .HasColumnType("int");
 
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TargetId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("TimeLeft")
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
                     b.HasIndex("AgentId");
+
+                    b.HasIndex("TargetId");
 
                     b.ToTable("Missions");
                 });
@@ -74,20 +84,54 @@ namespace Real_Time_Mossad_Agents_Management_System.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<bool>("Status")
                         .HasColumnType("bit");
+
+                    b.Property<string>("name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("photoUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
                     b.ToTable("Targets");
+                });
+
+            modelBuilder.Entity("Real_Time_Mossad_Agents_Management_System.Models.User", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("Real_Time_Mossad_Agents_Management_System.Models.Agent", b =>
+                {
+                    b.OwnsOne("Real_Time_Mossad_Agents_Management_System.Models.Location", "Location", b1 =>
+                        {
+                            b1.Property<int>("AgentId")
+                                .HasColumnType("int");
+
+                            b1.Property<int>("X")
+                                .HasColumnType("int");
+
+                            b1.Property<int>("Y")
+                                .HasColumnType("int");
+
+                            b1.HasKey("AgentId");
+
+                            b1.ToTable("Agents");
+
+                            b1.WithOwner()
+                                .HasForeignKey("AgentId");
+                        });
+
+                    b.Navigation("Location");
                 });
 
             modelBuilder.Entity("Real_Time_Mossad_Agents_Management_System.Models.Mission", b =>
@@ -98,7 +142,39 @@ namespace Real_Time_Mossad_Agents_Management_System.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Real_Time_Mossad_Agents_Management_System.Models.Target", "Target")
+                        .WithMany()
+                        .HasForeignKey("TargetId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Agent");
+
+                    b.Navigation("Target");
+                });
+
+            modelBuilder.Entity("Real_Time_Mossad_Agents_Management_System.Models.Target", b =>
+                {
+                    b.OwnsOne("Real_Time_Mossad_Agents_Management_System.Models.Location", "Location", b1 =>
+                        {
+                            b1.Property<int>("TargetId")
+                                .HasColumnType("int");
+
+                            b1.Property<int>("X")
+                                .HasColumnType("int");
+
+                            b1.Property<int>("Y")
+                                .HasColumnType("int");
+
+                            b1.HasKey("TargetId");
+
+                            b1.ToTable("Targets");
+
+                            b1.WithOwner()
+                                .HasForeignKey("TargetId");
+                        });
+
+                    b.Navigation("Location");
                 });
 #pragma warning restore 612, 618
         }

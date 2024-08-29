@@ -16,8 +16,8 @@ namespace Real_Time_Mossad_Agents_Management_System.Services
         public JwtService(IConfiguration configuration)
         {
             _secretKey = configuration["Jwt:Key"];
-            _issuer = configuration["Jwt:Issuer"];
-            _audience = configuration["Jwt:Audience"];
+            _issuer = configuration["Jwt:MissionManagement"];
+            _audience = configuration["Jwt:MissionManagement"];
         }
 
         public string GenerateJwtToken(User user)

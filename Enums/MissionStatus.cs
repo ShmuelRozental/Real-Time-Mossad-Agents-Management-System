@@ -2,8 +2,8 @@
 {
     public enum MissionStatus
     {
-        Offer,    
-        Assignd,  
-        Finished
+        Offer,
+        Assigned,
+        Completed
     }
 }

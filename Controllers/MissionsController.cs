@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Real_Time_Mossad_Agents_Management_System.Attributes;
 using Real_Time_Mossad_Agents_Management_System.Data;
 using Real_Time_Mossad_Agents_Management_System.Enums;
 using Real_Time_Mossad_Agents_Management_System.Models;
@@ -29,6 +30,7 @@ namespace Real_Time_Mossad_Agents_Management_System.Controllers
 
         // GET: api/Missions
         [HttpGet]
+        //[AuthorizeRoles("Admin", "Manager")]
         public async Task<ActionResult<IEnumerable<Mission>>> GetMissions()
         {
             try
@@ -44,28 +46,43 @@ namespace Real_Time_Mossad_Agents_Management_System.Controllers
 
         // GET: api/Missions/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Mission>> GetMission(int missionId)
-        {
-            var missions = await _missionsServices.GetAsync(missionId);
+        //[AuthorizeRoles("SimulationServer")]
 
-            if (missions == null)
+        public async Task<ActionResult<Mission>> GetMission(int id)
+        {
+            var mission = await _missionsServices.GetAsync(id);
+
+            if (mission == null)
             {
                 return NotFound();
             }
 
-            return Ok(missions);
+            return Ok(mission);
         }
 
         // PUT: api/Missions/5
         [HttpPut("{id}")]
-        public async Task<ActionResult> MissionAssignedment(int missionId, [FromBody] MissionStatus status)
+        public async Task<ActionResult> MissionAssignedment(int id, [FromBody] Dictionary<string, string> status)
         {
-            await _missionsServices.UpdateStatus(missionId, status);
-
-            return Ok();
-
+            
+            if (status.TryGetValue("status", out var statusValue))
+            {
+               
+                if (Enum.TryParse<MissionStatus>(statusValue, true, out var missionStatus))
+                {
+                    await _missionsServices.UpdateStatus(id, missionStatus);
+                    return Ok();
+                }
+                else
+                {
+                    return BadRequest("Invalid MissionStatus value.");
+                }
+            }
+            else
+            {
+                return BadRequest("Status not provided.");
+            }
         }
-
         //POST: api/Missions/Update
         [HttpPost("Update")]
         public async Task<ActionResult> UpdateMissions()

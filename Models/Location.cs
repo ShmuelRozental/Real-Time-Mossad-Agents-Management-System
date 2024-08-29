@@ -24,24 +24,24 @@ namespace Real_Time_Mossad_Agents_Management_System.Models
                     Y -= 1;
                     break;
                 case Direction.N:
-                    Y -= 1;
+                    X -= 1;
                     break;
                 case Direction.NE:
+                    X -= 1;
+                    Y += 1;
+                    break;
+                case Direction.W:
+                    Y -= 1;
+                    break;
+                case Direction.E:
+                    Y += 1;
+                    break;
+                case Direction.SW:
                     X += 1;
                     Y -= 1;
                     break;
-                case Direction.W:
-                    X -= 1;
-                    break;
-                case Direction.E:
-                    X += 1;
-                    break;
-                case Direction.SW:
-                    X -= 1;
-                    Y += 1;
-                    break;
                 case Direction.S:
-                    Y += 1;
+                    X += 1;
                     break;
                 case Direction.SE:
                     X += 1;

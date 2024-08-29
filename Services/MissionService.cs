@@ -10,6 +10,7 @@ namespace Real_Time_Mossad_Agents_Management_System.Services
     {
         private readonly AppDbContext _dbContext;
         private readonly IManagementServices<T> _imanagementServices;
+
         public MissionsServices(AppDbContext dbContext, IManagementServices<T> managementServices)
         {
             _dbContext = dbContext;
@@ -29,7 +30,7 @@ namespace Real_Time_Mossad_Agents_Management_System.Services
         public async Task<List<Mission>> GetAllAsync()
         {
             var missions = await _dbContext.Missions.ToListAsync();
-            if (missions == null || missions.Count == 0)
+            if ( missions.Count == 0)
             {
                 throw new Exception("failed retrive Targets");
             }
@@ -39,20 +40,56 @@ namespace Real_Time_Mossad_Agents_Management_System.Services
       
         public async Task<Mission> UpdateStatus(int missionId, MissionStatus status)
         {
-            var mission = await _dbContext.Missions.FindAsync(missionId);
+            var mission = await _dbContext.Missions
+                .Include(m => m.Agent)
+                .Include(m => m.Target)
+                .FirstOrDefaultAsync(m => m.Id == missionId);
 
             if (mission == null)
             {
                 throw new KeyNotFoundException("mission not found.");
             }
-            if (!_imanagementServices.IsWithinDistance(mission.Agent.Location, mission.Target.Location))
+            if (mission.Agent == null)
+            {
+                throw new InvalidOperationException("Mission agent is null.");
+            }
+
+            if (mission.Target == null)
+            {
+                throw new InvalidOperationException("Mission target is null.");
+            }
+
+            if (mission.Agent.Location == null || mission.Agent.ActiveStatus)
+            {
+                throw new InvalidOperationException("Agent location is null  or on a miision.");
+            }
+
+            if (mission.Target.Location == null || mission.Target.Status)
+            {
+                throw new InvalidOperationException("Target location is null or the target already killed.");
+            }
+            if (_imanagementServices.CalculateDistance(mission.Agent.Location, mission.Target.Location) > 200)
             {
                 throw new InvalidOperationException("target is to far distance from agent");
             }
 
             mission.Status = status;
-            mission.Agent.ActiveStatus = true;
-            double remainingTime = _imanagementServices.CalculateDistance(mission.Agent.Location, mission.Target.Location);
+
+            if (status == MissionStatus.Assigned)
+            {
+                mission.Agent.ActiveStatus = true;
+            }
+            else if (status == MissionStatus.Completed || status == MissionStatus.Offer)
+            {
+                mission.Agent.ActiveStatus = false;
+            }
+            _dbContext.Update(mission.Agent);
+            await _dbContext.SaveChangesAsync();
+
+            double remainingTime = _imanagementServices
+                .CalculateDistance(mission.Agent.Location, mission.Target.Location) /5;
+
+            mission.TimeLeft = TimeSpan.FromHours(remainingTime);
 
             var offeredMissionsToRemove = await _dbContext.Missions
                 .Where(m =>
@@ -65,15 +102,17 @@ namespace Real_Time_Mossad_Agents_Management_System.Services
             _dbContext.Update(mission);
             await _dbContext.SaveChangesAsync();
             return mission;
-
-            _dbContext.Update(mission);
-            await _dbContext.SaveChangesAsync();
         }
 
         public async Task StartMissionsAsync()
         {
-            var missionToStart = await _dbContext.Missions.Where(m => m.Status == MissionStatus.Assignd).ToListAsync();
-            foreach (var mission in missionToStart)
+            var missionsToStart = await _dbContext.Missions
+                 .Include(m => m.Agent)
+                 .Include(m => m.Target)
+                 .Where(m => m.Status == MissionStatus.Assigned)
+                 .ToListAsync();
+
+            foreach (var mission in missionsToStart)
             {
                 await _imanagementServices.StartMissionAsync(mission);
             }

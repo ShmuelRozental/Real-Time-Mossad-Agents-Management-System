@@ -4,6 +4,7 @@ using Microsoft.IdentityModel.Tokens;
 using Real_Time_Mossad_Agents_Management_System.Data;
 using Real_Time_Mossad_Agents_Management_System.Interfaces;
 using Real_Time_Mossad_Agents_Management_System.Services;
+using Real_Time_Mossad_Agents_Management_System.Midlleware;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -58,6 +59,7 @@ app.UseHttpsRedirection();
 app.UseAuthentication(); 
 app.UseAuthorization();
 
+app.UseMiddleware<AuthorizationMiddleware>();
 app.MapControllers();
 
 app.Run();

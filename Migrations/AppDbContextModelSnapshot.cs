@@ -61,8 +61,8 @@ namespace Real_Time_Mossad_Agents_Management_System.Migrations
                     b.Property<int>("TargetId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("TimeLeft")
-                        .HasColumnType("datetime2");
+                    b.Property<TimeSpan>("TimeLeft")
+                        .HasColumnType("time");
 
                     b.HasKey("Id");
 

@@ -94,11 +94,12 @@ namespace Real_Time_Mossad_Agents_Management_System.Services
                     {
 
                         bool hasTargetWhitAsignMission = await HasActiveMissionAsync(target);
+                        bool hasAgentTargetMission = await HasActiveMissionForAgentAndTargetAsync(agent.Id, target.Id);
                         if (!agent.ActiveStatus &&
-                            IsWithinDistance(
+                            CalculateDistance(
                                 agent.Location, target.Location
-                            )
-                            && !hasTargetWhitAsignMission)
+                            ) < 200
+                            && !hasTargetWhitAsignMission && !hasAgentTargetMission)
                         {
                             await CreateAsync(agent, target);
                         }
@@ -107,6 +108,7 @@ namespace Real_Time_Mossad_Agents_Management_System.Services
 
                 case Target target:
                     bool targetWhitAsignMission = await HasActiveMissionAsync(target);
+
                     if (targetWhitAsignMission)
                     {
                         break;
@@ -114,7 +116,8 @@ namespace Real_Time_Mossad_Agents_Management_System.Services
                     var agents = await _dbContext.Agents.Where(a => !a.ActiveStatus).ToListAsync();
                     foreach (var agent in agents)
                     {
-                        if (IsWithinDistance(target.Location, agent.Location))
+                        bool hasAgentTargetMission = await HasActiveMissionForAgentAndTargetAsync(agent.Id, target.Id);
+                        if (IsWithinDistance(target.Location, agent.Location) && !hasAgentTargetMission)
                         {
 
                             await CreateAsync(agent, target);
@@ -136,7 +139,7 @@ namespace Real_Time_Mossad_Agents_Management_System.Services
                     foreach (var mision in targetMisions)
                     {
 
-                        if (mision.Status == MissionStatus.Offer && !IsWithinDistance(mision.Agent.Location, target.Location))
+                        if (mision.Status == MissionStatus.Offer && CalculateDistance(mision.Agent.Location, target.Location) > 200)
                         {
                             await DeleteMissionAsync(mision.Id);
                         }
@@ -149,7 +152,7 @@ namespace Real_Time_Mossad_Agents_Management_System.Services
                     {
 
 
-                        if (mision.Status == MissionStatus.Offer && !IsWithinDistance(mision.Target.Location, agent.Location))
+                        if (mision.Status == MissionStatus.Offer && CalculateDistance(mision.Target.Location, agent.Location) > 200)
                         {
                             await DeleteMissionAsync(mision.Id);
                         }
@@ -162,7 +165,7 @@ namespace Real_Time_Mossad_Agents_Management_System.Services
         }
 
         public async Task StartMissionAsync(Mission mission)
-        {
+       {
             if (mission.Agent == null || mission.Target == null)
             {
                 throw new ArgumentNullException("Entities cannot be null");
@@ -179,7 +182,7 @@ namespace Real_Time_Mossad_Agents_Management_System.Services
             Direction nextMove = DetermineDirection(agentLocation, targetLocation);
             mission.Agent.Location.Move(nextMove);
 
-            if (mission.Agent.Location == mission.Target.Location)
+            if (HasReachedTarget(mission.Agent.Location, mission.Target.Location))
             {
                 await EndMissionAsync(mission);
             }
@@ -188,8 +191,9 @@ namespace Real_Time_Mossad_Agents_Management_System.Services
 
         public async Task EndMissionAsync(Mission mission)
         {
-            mission.Status = MissionStatus.Finished;
+            mission.Status = MissionStatus.Completed;
             mission.Target.Status = true;
+            mission.Agent.ActiveStatus = false; 
 
             _dbContext.Update(mission);
             await _dbContext.SaveChangesAsync();
@@ -203,15 +207,15 @@ namespace Real_Time_Mossad_Agents_Management_System.Services
 
             if (deltaX == 0)
             {
-                return deltaY > 0 ? Direction.N : Direction.S;
+                return deltaY > 0 ? Direction.E : Direction.W;
             }
             else if (deltaY == 0)
             {
-                return deltaX > 0 ? Direction.E : Direction.W;
+                return deltaX > 0 ? Direction.S : Direction.N;
             }
             else
             {
-                if (Math.Abs(deltaX) > Math.Abs(deltaY))
+                if (deltaX > deltaY)
                 {
                     return deltaX > 0
                         ? (deltaY > 0 ? Direction.SE : Direction.SW)
@@ -224,6 +228,19 @@ namespace Real_Time_Mossad_Agents_Management_System.Services
                         : (deltaX > 0 ? Direction.SW : Direction.NW);
                 }
             }
+        }
+
+
+        private async Task<bool> HasActiveMissionForAgentAndTargetAsync(int agentId, int targetId)
+        {
+            return await _dbContext.Missions
+                .AnyAsync(m => m.AgentId == agentId && m.TargetId == targetId);
+        }
+
+        public bool HasReachedTarget(Location agent, Location target, double tolerance = 0.01)
+        {
+            double distance = CalculateDistance(agent, target);
+            return distance <= tolerance;
         }
 
         public async Task<bool> HasActiveMissionAsync(Target target)

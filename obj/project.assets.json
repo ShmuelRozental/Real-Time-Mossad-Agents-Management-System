@@ -8015,11 +8015,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\rozen\\projects\\c#\\finalProject\\Real-Time Mossad Agents Management System\\Real-Time Mossad Agents Management System\\Real-Time Mossad Agents Management System.csproj",
+      "projectUniqueName": "C:\\Users\\rozen\\projects\\c#\\finalProject\\MissionManagement-SERVER\\Real-Time Mossad Agents Management System\\Real-Time Mossad Agents Management System.csproj",
       "projectName": "Real-Time Mossad Agents Management System",
-      "projectPath": "C:\\Users\\rozen\\projects\\c#\\finalProject\\Real-Time Mossad Agents Management System\\Real-Time Mossad Agents Management System\\Real-Time Mossad Agents Management System.csproj",
+      "projectPath": "C:\\Users\\rozen\\projects\\c#\\finalProject\\MissionManagement-SERVER\\Real-Time Mossad Agents Management System\\Real-Time Mossad Agents Management System.csproj",
       "packagesPath": "C:\\Users\\rozen\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\rozen\\projects\\c#\\finalProject\\Real-Time Mossad Agents Management System\\Real-Time Mossad Agents Management System\\obj\\",
+      "outputPath": "C:\\Users\\rozen\\projects\\c#\\finalProject\\MissionManagement-SERVER\\Real-Time Mossad Agents Management System\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\rozen\\AppData\\Roaming\\NuGet\\NuGet.Config",

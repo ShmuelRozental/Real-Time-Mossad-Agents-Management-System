@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "L/tgTm73CPc=",
+  "dgSpecHash": "mSzJ3fh+1g8=",
   "success": true,
-  "projectFilePath": "C:\\Users\\rozen\\projects\\c#\\finalProject\\Real-Time Mossad Agents Management System\\Real-Time Mossad Agents Management System\\Real-Time Mossad Agents Management System.csproj",
+  "projectFilePath": "C:\\Users\\rozen\\projects\\c#\\finalProject\\MissionManagement-SERVER\\Real-Time Mossad Agents Management System\\Real-Time Mossad Agents Management System.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\rozen\\.nuget\\packages\\azure.core\\1.35.0\\azure.core.1.35.0.nupkg.sha512",
     "C:\\Users\\rozen\\.nuget\\packages\\azure.identity\\1.10.3\\azure.identity.1.10.3.nupkg.sha512",
